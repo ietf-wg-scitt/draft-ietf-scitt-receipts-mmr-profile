@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-10-11T00:40:38.005081+00:00",
+  "timestamp": "2026-11-17T00:20:46.956716+00:00",
   "repo": "robinbryce/draft-bryce-cose-receipts-mmr-profile",
   "labels": [
     {
@@ -2024,6 +2024,54 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 66,
+      "id": "PR_kwDOO_kfWc8AAAABPXAzrQ",
+      "title": "Run the python blocks in CI and add known-answer values (#58)",
+      "url": "https://github.com/robinbryce/draft-bryce-cose-receipts-mmr-profile/pull/66",
+      "state": "OPEN",
+      "author": "bassem0001",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "Addresses #58 (the CI script and known-answer values; the two one-line fixes are left to separate PRs).\n\n`tools/check_python_blocks.py` extracts every python block from the draft and runs it against an MMR built independently (standard library only). Against `main` (f1320c0), at 256 leaves:\n\n- `add_leaf_hash` builds the same node values as the reference;\n- `index_height` matches the structural height, and `index_height(n) == 0` exactly when MMR(n) is complete;\n- `peaks`, `leaf_count` and `mmr_size_for_leaf_count` match;\n- `inclusion_proof_path` + `included_root` prove every node to its peak at every complete size (64,767 pairs);\n- `consistency_proof_paths` + `consistent_roots` complete the target accumulator for all 32,896 pairs of complete sizes, including from 0;\n- the `# if ... -> ERROR` comments in `consistent_roots` are run as checks, and each rejection must fire at its own line.\n\n`tools/known-answers.json` holds values computed by the blocks: the nodes of MMR(39), inclusion proofs (including empty paths), consistency proofs (from 0, several origin peaks, an origin peak above the split), and the confusable target sizes from the 26 Sep note (7 \u2192 8 read as 10; 7 \u2192 16 read as 18 and 22), where the fold accepts and only the signed tree-size-2 rejects. A workflow runs it on changes to the draft or `tools/`; `make check-python` runs it locally.\n\nThings the script found while running the blocks as written:\n\n1. `ones_count` is described in prose only (Assumed bit primitives), so the script supplies `bin(v).count(\"1\")`. A one-line python block would let the text run as-is.\n2. The `trailing_zeros` block is an expression, not a function, so it is not executed. Nothing else calls it.\n3. Still open on `main`, as #58 notes: `inclusion_proof_path` only requires `i <= c`. At incomplete sizes, up to 32 leaves, 258 (node, size) pairs give a path that proves a node not yet in the tree (for example node 0 at size 2 proves node 2).\n4. Still open: no bound on the inclusion path length at the verifier.\n\nMutation-checked: breaking `all_ones`, swapping the operand order in `included_root`, or deleting either of two `-> ERROR` lines makes the check fail (a non-terminating block fails after a time limit rather than hanging CI).\n",
+      "createdAt": "2026-11-15T18:21:57Z",
+      "updatedAt": "2026-11-16T12:36:47Z",
+      "baseRepository": "robinbryce/draft-bryce-cose-receipts-mmr-profile",
+      "baseRefName": "main",
+      "baseRefOid": "f1320c0d631fa916098aefb80c7ed8fa6c9246cf",
+      "headRepository": "AugmentEV/draft-bryce-cose-receipts-mmr-profile",
+      "headRefName": "check-python-blocks",
+      "headRefOid": "ab0c398bc44966db9e3a445f5757a89fbe3dcc69",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "bassem0001",
+          "authorAssociation": "NONE",
+          "body": "Thanks, Robin. Before merging, could you approve the two pending workflow runs? GitHub holds them for PRs from forks, so the new check hasn't run on the PR yet. Happy to fix anything it turns up.",
+          "createdAt": "2026-11-16T12:36:46Z",
+          "updatedAt": "2026-11-16T12:36:46Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOO_kfWc8AAAABYNZMGQ",
+          "commit": {
+            "abbreviatedOid": "ab0c398"
+          },
+          "author": "robinbryce",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "LGTM. I particularly like that we now have CI coverage of the draft content. Thanks! ",
+          "createdAt": "2026-11-16T12:01:38Z",
+          "updatedAt": "2026-11-16T12:01:38Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
