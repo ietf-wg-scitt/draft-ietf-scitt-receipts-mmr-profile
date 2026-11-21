@@ -2,14 +2,14 @@
 
 
 
-TBD                                                             R. Bryce
+SCITT                                                           R. Bryce
 Internet-Draft                                                          
 Intended status: Standards Track                               J. Geater
 Expires: 25 May 2027                                    21 November 2026
 
 
                          COSE Receipts for MMRs
-              draft-bryce-cose-receipts-mmr-profile-latest
+              draft-ietf-scitt-receipts-mmr-profile-latest
 
 Abstract
 
