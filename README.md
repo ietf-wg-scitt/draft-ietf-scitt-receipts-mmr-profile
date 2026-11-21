@@ -2,18 +2,18 @@
 
 # COSE Receipts for MMRs
 
-This is the working area for the individual Internet-Draft, "COSE Receipts for MMRs".
+This is the working area for the SCITT Working Group Internet-Draft, "COSE Receipts for MMRs".
 
-* [Editor's Copy](https://robinbryce.github.io/draft-bryce-cose-receipts-mmr-profile/#go.draft-bryce-cose-receipts-mmr-profile.html)
-* [Datatracker Page](https://datatracker.ietf.org/doc/draft-bryce-cose-receipts-mmr-profile)
-* [Individual Draft](https://datatracker.ietf.org/doc/html/draft-bryce-cose-receipts-mmr-profile)
-* [Compare Editor's Copy to Individual Draft](https://robinbryce.github.io/draft-bryce-cose-receipts-mmr-profile/#go.draft-bryce-cose-receipts-mmr-profile.diff)
+* [Editor's Copy](https://ietf-wg-scitt.github.io/draft-ietf-scitt-receipts-mmr-profile/#go.draft-ietf-scitt-receipts-mmr-profile.html)
+* [Datatracker Page](https://datatracker.ietf.org/doc/draft-ietf-scitt-receipts-mmr-profile)
+* [Working Group Draft](https://datatracker.ietf.org/doc/html/draft-ietf-scitt-receipts-mmr-profile)
+* [Compare Editor's Copy to Working Group Draft](https://ietf-wg-scitt.github.io/draft-ietf-scitt-receipts-mmr-profile/#go.draft-ietf-scitt-receipts-mmr-profile.diff)
 
 
 ## Contributing
 
 See the
-[guidelines for contributions](https://github.com/robinbryce/draft-bryce-cose-receipts-mmr-profile/blob/main/CONTRIBUTING.md).
+[guidelines for contributions](https://github.com/ietf-wg-scitt/draft-ietf-scitt-receipts-mmr-profile/blob/main/CONTRIBUTING.md).
 
 Contributions can be made by creating pull requests.
 The GitHub interface supports creating pull requests using the Edit (✏) button.

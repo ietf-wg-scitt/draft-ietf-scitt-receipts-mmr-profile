@@ -3,14 +3,14 @@ title: "COSE Receipts for MMRs"
 abbrev: "COSE Receipts for MMRs"
 category: std
 
-docname: draft-bryce-cose-receipts-mmr-profile-latest
+docname: draft-ietf-scitt-receipts-mmr-profile-latest
 submissiontype: IETF
 number:
 date:
 consensus: true
 v: 3
 area: "Security"
-workgroup: TBD
+workgroup: SCITT
 keyword:
 
 - Internet-Draft
