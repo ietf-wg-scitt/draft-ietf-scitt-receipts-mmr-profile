@@ -1,0 +1,296 @@
+{
+ "description": "Known-answer values for draft-bryce-cose-receipts-mmr-profile, computed by running the draft's python blocks (tools/check_python_blocks.py). Leaf n = SHA-256(n as 8-byte big-endian).",
+ "hash": "SHA-256",
+ "mmr39": {
+  "leaves": 21,
+  "nodes": [
+   "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+   "cd2662154e6d76b2b2b92e70c0cac3ccf534f9b74eb5b89819ec509083d00a50",
+   "ad104051c516812ea5874ca3ff06d0258303623d04307c41ec80a7a18b332ef8",
+   "cd04a4754498e06db5a13c5f371f1f04ff6d2470f24aa9bd886540e5dce77f70",
+   "d5688a52d55a02ec4aea5ec1eadfffe1c9e0ee6a4ddbe2377f98326d42dfc975",
+   "fd0cd4531d4f1b9e7490623a205a04cb324ea6b672bd0e2a6f8bbf5683ab9447",
+   "455a53a8540137855742f7326d0fbfb37f77231cf14a3d0e32e7aba29be0c383",
+   "8005f02d43fa06e7d0585fb64c961d57e318b27a145c857bcd3a6bdb413ff7fc",
+   "5dee4dd60ff8d0ba9900fe91e90e0dcf65f0570d42c431f727d0300dd70dc431",
+   "f189f16f6498f3c4adf83f8879a81ab8f2c1c2705c44a160bda813d87c20ee38",
+   "14ac577cdb2ef6d986078b4054cc9893a9a14a16dbb0d8f37b89167c1f1aacdf",
+   "a3eb8db89fc5123ccfd49585059f292bc40a1c0d550b860f24f84efb4760fbf2",
+   "c7cebc988237aba19f862b0c3ba296a1932ec851eaef552b04b8016bb4a3ba86",
+   "16ca4e663dd1dc509db7dadc3d80d8217396c1d4b9137f34f55e04e5aa45b2ac",
+   "5aa15ba1fa7c2def680835f90dfc60adb26770d77e49b916d137f796fbc2792f",
+   "4c0e071832d527694adea57b50dd7b2164c2a47c02940dcf26fa07c44d6d222a",
+   "5924513516a5993435ec4a240610304aca7d4acf1f2de5ce6812a8c43610c6e6",
+   "c0e541e3ac88ed5bb8f8dafdaeb84c181f19ee57cbb98b15378768cd0adb0a24",
+   "8d85f8467240628a94819b26bee26e3a9b2804334c63482deacec8d64ab4e1e7",
+   "0b5000b73a53f0916c93c68f4b9b6ba8af5a10978634ae4f2237e1f3fbe324fa",
+   "9a64f6bfe77b78cc140e4a8692da44c1da7bb9afe3ea51f6eaff671f60bca1cc",
+   "3b965b11527998528d5234134294d3377e36103254222018645f4e72265241c3",
+   "d27a8d9a8d38c7a37c922450a7a1961f138abfa25f5da3df2b972820715fa5ae",
+   "1f5edc6f1efb165d45a654798d4baaa50e3b4d24182913aef5110a15580ebaad",
+   "73936b96f7fd4c23bbf691cf833bf5a11abbfcdc26d05eed075b9a8ab3347378",
+   "76b1ff1a6cb1b23738647eb1ea40d8f14b037285e457214aab335874feb6e79e",
+   "e66c57014a6156061ae669809ec5d735e484e8fcfd540e110c9b04f84c0b4504",
+   "2aa621521963e9d0ad0c3b570ffe8f36bf856de75be1219786fa0ebb3cf8e1ec",
+   "8caf7ab416626bc6fef1969998e788c29bcfed8348e080f7d5d86b397eab012e",
+   "0f6b264e234de20807a942e59c2dc68bf4222ab181e40a52bbffe5507650b58a",
+   "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf",
+   "998e907bfbb34f71c66b6dc6c40fe98ca6d2d5a29755bc5a04824c36082a61d1",
+   "a348621a527709a7d3a71eec18de7bb281a01af97f06fe463c87d0de5c437f75",
+   "5477663c074ec9a33d23d34280861f614675fe264f1a7372b132a1841ba56647",
+   "5bc67471c189d78c76461dcab6141a733bdab3799d1d69e0c419119c92e82b3d",
+   "1b8d0103e3a8d9ce8bda3bff71225be4b5bb18830466ae94f517321b7ecc6f94",
+   "84e4409eee39061c126c446ab8ee7ec2deb4ef534d90b3ae9174ab28d91bbe54",
+   "bbe6d1ade9b5a8a6d286ce30f03a777f0fa32e03fff6f8ce53a305c0d17d26cb",
+   "22a264ee63bc826a6df778800a62ca8f7033d50f14c7c738ece23b505f2bf3c4"
+  ],
+  "heights": [
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   2,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   2,
+   3,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   2,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   2,
+   3,
+   4,
+   0,
+   0,
+   1,
+   0,
+   0,
+   1,
+   2,
+   0
+  ]
+ },
+ "inclusion": [
+  {
+   "index": 0,
+   "size": 39,
+   "node": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+   "path_indices": [
+    1,
+    5,
+    13,
+    29
+   ],
+   "path": [
+    "cd2662154e6d76b2b2b92e70c0cac3ccf534f9b74eb5b89819ec509083d00a50",
+    "fd0cd4531d4f1b9e7490623a205a04cb324ea6b672bd0e2a6f8bbf5683ab9447",
+    "16ca4e663dd1dc509db7dadc3d80d8217396c1d4b9137f34f55e04e5aa45b2ac",
+    "0f6b264e234de20807a942e59c2dc68bf4222ab181e40a52bbffe5507650b58a"
+   ],
+   "root": "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf"
+  },
+  {
+   "index": 17,
+   "size": 39,
+   "node": "c0e541e3ac88ed5bb8f8dafdaeb84c181f19ee57cbb98b15378768cd0adb0a24",
+   "path_indices": [
+    20,
+    28,
+    14
+   ],
+   "path": [
+    "9a64f6bfe77b78cc140e4a8692da44c1da7bb9afe3ea51f6eaff671f60bca1cc",
+    "8caf7ab416626bc6fef1969998e788c29bcfed8348e080f7d5d86b397eab012e",
+    "5aa15ba1fa7c2def680835f90dfc60adb26770d77e49b916d137f796fbc2792f"
+   ],
+   "root": "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf"
+  },
+  {
+   "index": 30,
+   "size": 39,
+   "node": "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf",
+   "path_indices": [],
+   "path": [],
+   "root": "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf"
+  },
+  {
+   "index": 38,
+   "size": 39,
+   "node": "22a264ee63bc826a6df778800a62ca8f7033d50f14c7c738ece23b505f2bf3c4",
+   "path_indices": [],
+   "path": [],
+   "root": "22a264ee63bc826a6df778800a62ca8f7033d50f14c7c738ece23b505f2bf3c4"
+  }
+ ],
+ "consistency": [
+  {
+   "sizefrom": 0,
+   "sizeto": 39,
+   "accumulatorfrom": [],
+   "proofs": [],
+   "roots": [],
+   "right_peaks_required": 3,
+   "accumulatorto": [
+    "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf",
+    "bbe6d1ade9b5a8a6d286ce30f03a777f0fa32e03fff6f8ce53a305c0d17d26cb",
+    "22a264ee63bc826a6df778800a62ca8f7033d50f14c7c738ece23b505f2bf3c4"
+   ]
+  },
+  {
+   "sizefrom": 7,
+   "sizeto": 39,
+   "accumulatorfrom": [
+    "455a53a8540137855742f7326d0fbfb37f77231cf14a3d0e32e7aba29be0c383"
+   ],
+   "proofs": [
+    [
+     "16ca4e663dd1dc509db7dadc3d80d8217396c1d4b9137f34f55e04e5aa45b2ac",
+     "0f6b264e234de20807a942e59c2dc68bf4222ab181e40a52bbffe5507650b58a"
+    ]
+   ],
+   "roots": [
+    "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf"
+   ],
+   "right_peaks_required": 2,
+   "accumulatorto": [
+    "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf",
+    "bbe6d1ade9b5a8a6d286ce30f03a777f0fa32e03fff6f8ce53a305c0d17d26cb",
+    "22a264ee63bc826a6df778800a62ca8f7033d50f14c7c738ece23b505f2bf3c4"
+   ]
+  },
+  {
+   "sizefrom": 11,
+   "sizeto": 39,
+   "accumulatorfrom": [
+    "455a53a8540137855742f7326d0fbfb37f77231cf14a3d0e32e7aba29be0c383",
+    "f189f16f6498f3c4adf83f8879a81ab8f2c1c2705c44a160bda813d87c20ee38",
+    "14ac577cdb2ef6d986078b4054cc9893a9a14a16dbb0d8f37b89167c1f1aacdf"
+   ],
+   "proofs": [
+    [
+     "16ca4e663dd1dc509db7dadc3d80d8217396c1d4b9137f34f55e04e5aa45b2ac",
+     "0f6b264e234de20807a942e59c2dc68bf4222ab181e40a52bbffe5507650b58a"
+    ],
+    [
+     "c7cebc988237aba19f862b0c3ba296a1932ec851eaef552b04b8016bb4a3ba86",
+     "455a53a8540137855742f7326d0fbfb37f77231cf14a3d0e32e7aba29be0c383",
+     "0f6b264e234de20807a942e59c2dc68bf4222ab181e40a52bbffe5507650b58a"
+    ],
+    [
+     "a3eb8db89fc5123ccfd49585059f292bc40a1c0d550b860f24f84efb4760fbf2",
+     "f189f16f6498f3c4adf83f8879a81ab8f2c1c2705c44a160bda813d87c20ee38",
+     "455a53a8540137855742f7326d0fbfb37f77231cf14a3d0e32e7aba29be0c383",
+     "0f6b264e234de20807a942e59c2dc68bf4222ab181e40a52bbffe5507650b58a"
+    ]
+   ],
+   "roots": [
+    "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf"
+   ],
+   "right_peaks_required": 2,
+   "accumulatorto": [
+    "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf",
+    "bbe6d1ade9b5a8a6d286ce30f03a777f0fa32e03fff6f8ce53a305c0d17d26cb",
+    "22a264ee63bc826a6df778800a62ca8f7033d50f14c7c738ece23b505f2bf3c4"
+   ]
+  },
+  {
+   "sizefrom": 19,
+   "sizeto": 26,
+   "accumulatorfrom": [
+    "5aa15ba1fa7c2def680835f90dfc60adb26770d77e49b916d137f796fbc2792f",
+    "c0e541e3ac88ed5bb8f8dafdaeb84c181f19ee57cbb98b15378768cd0adb0a24",
+    "8d85f8467240628a94819b26bee26e3a9b2804334c63482deacec8d64ab4e1e7"
+   ],
+   "proofs": [
+    [],
+    [
+     "9a64f6bfe77b78cc140e4a8692da44c1da7bb9afe3ea51f6eaff671f60bca1cc"
+    ],
+    [
+     "0b5000b73a53f0916c93c68f4b9b6ba8af5a10978634ae4f2237e1f3fbe324fa",
+     "c0e541e3ac88ed5bb8f8dafdaeb84c181f19ee57cbb98b15378768cd0adb0a24"
+    ]
+   ],
+   "roots": [
+    "5aa15ba1fa7c2def680835f90dfc60adb26770d77e49b916d137f796fbc2792f",
+    "3b965b11527998528d5234134294d3377e36103254222018645f4e72265241c3"
+   ],
+   "right_peaks_required": 2,
+   "accumulatorto": [
+    "5aa15ba1fa7c2def680835f90dfc60adb26770d77e49b916d137f796fbc2792f",
+    "3b965b11527998528d5234134294d3377e36103254222018645f4e72265241c3",
+    "73936b96f7fd4c23bbf691cf833bf5a11abbfcdc26d05eed075b9a8ab3347378",
+    "76b1ff1a6cb1b23738647eb1ea40d8f14b037285e457214aab335874feb6e79e"
+   ]
+  },
+  {
+   "sizefrom": 31,
+   "sizeto": 38,
+   "accumulatorfrom": [
+    "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf"
+   ],
+   "proofs": [
+    []
+   ],
+   "roots": [
+    "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf"
+   ],
+   "right_peaks_required": 1,
+   "accumulatorto": [
+    "d380b39b72063c7778a32e57d756a4666af1b093a6263387d9577038eb06dfcf",
+    "bbe6d1ade9b5a8a6d286ce30f03a777f0fa32e03fff6f8ce53a305c0d17d26cb"
+   ]
+  }
+ ],
+ "confusable_sizes": [
+  {
+   "sizefrom": 7,
+   "honest_sizeto": 8,
+   "declared_sizeto": 10,
+   "fold_accepts": true,
+   "roots": [
+    "455a53a8540137855742f7326d0fbfb37f77231cf14a3d0e32e7aba29be0c383"
+   ],
+   "right_peaks_required": 1,
+   "note": "the fold accepts; only the signed tree-size-2 compared with the proof's tree-size-2 rejects this (see Security Considerations)"
+  },
+  {
+   "sizefrom": 7,
+   "honest_sizeto": 16,
+   "declared_sizeto": 18,
+   "fold_accepts": true,
+   "roots": [
+    "5aa15ba1fa7c2def680835f90dfc60adb26770d77e49b916d137f796fbc2792f"
+   ],
+   "right_peaks_required": 1,
+   "note": "the fold accepts; only the signed tree-size-2 compared with the proof's tree-size-2 rejects this (see Security Considerations)"
+  },
+  {
+   "sizefrom": 7,
+   "honest_sizeto": 16,
+   "declared_sizeto": 22,
+   "fold_accepts": true,
+   "roots": [
+    "5aa15ba1fa7c2def680835f90dfc60adb26770d77e49b916d137f796fbc2792f"
+   ],
+   "right_peaks_required": 1,
+   "note": "the fold accepts; only the signed tree-size-2 compared with the proof's tree-size-2 rejects this (see Security Considerations)"
+  }
+ ]
+}

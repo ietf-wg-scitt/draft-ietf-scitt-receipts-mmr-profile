@@ -1,0 +1,26 @@
+name: "Check the python blocks"
+
+on:
+  push:
+    paths:
+    - draft-bryce-cose-receipts-mmr-profile.md
+    - tools/**
+    - .github/workflows/python-blocks.yml
+  pull_request:
+    paths:
+    - draft-bryce-cose-receipts-mmr-profile.md
+    - tools/**
+    - .github/workflows/python-blocks.yml
+
+jobs:
+  check:
+    name: "Run the draft's python blocks"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v4
+
+    - name: "Run the blocks and compare the known-answer values"
+      run: python3 tools/check_python_blocks.py --check-vectors tools/known-answers.json

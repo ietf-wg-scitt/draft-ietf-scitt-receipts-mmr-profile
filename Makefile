@@ -13,3 +13,7 @@ else
 	    https://github.com/martinthomson/i-d-template $(LIBDIR)
 endif
 endif
+
+.PHONY: check-python
+check-python:
+	python3 tools/check_python_blocks.py --check-vectors tools/known-answers.json
