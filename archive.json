@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-22T00:22:12.184195+00:00",
+  "timestamp": "2026-11-24T08:41:14.209194+00:00",
   "repo": "ietf-wg-scitt/draft-ietf-scitt-receipts-mmr-profile",
   "labels": [
     {
@@ -742,9 +742,24 @@
       "labels": [],
       "body": "[Section 11.1 of -00](https://www.ietf.org/archive/id/draft-ietf-scitt-receipts-mmr-profile-00.html#section-11.1) says that a receipt of inclusion carries no tree size and verifies in every later tree size. [Section 5.1](https://www.ietf.org/archive/id/draft-ietf-scitt-receipts-mmr-profile-00.html#section-5.1) lets a verifier that holds a trusted tree size and accumulator check that the peak implied by the inclusion path matches the accumulator peak for the index at that size.\n\n### Question\n\nSuppose a receipt was issued while its node sat under a peak that has since been absorbed into a higher peak. Its path then ends at a node that is no longer a peak of the trusted accumulator, so the additional check in 5.1 fails, although the receipt is genuine. Should 5.1 say how a verifier establishes inclusion in its trusted state in that case, for example using retained consistency paths from a trusted state in which the earlier peak was still a peak, or by obtaining a current receipt?\n\n### Not claimed\n\nWe have no MMR reader yet, so none of this is measured against the profile. The question comes from reading the text of -00.\n\nAssisted by little helpers.",
       "createdAt": "2026-11-21T21:21:49Z",
-      "updatedAt": "2026-11-21T21:21:49Z",
+      "updatedAt": "2026-11-22T20:20:09Z",
       "closedAt": null,
-      "comments": []
+      "comments": [
+        {
+          "author": "robinbryce",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yes we could do that. If the verifier trusts the state they have, then yes, all they need is the consistency proof from the old accumulator to the new. Consistency proofs lead naturally to a system where the destination peaks are naturally signed by the log. And receipts can be just as well \"self served\" from the log data or \"self extended\" from a previous receipt and the new accumulator consistency proof paths.\n\nI'd held of that before as there are a few ways to accomplish this and it may benefit implementations to excecise some choice. I think it would be a good addition though.",
+          "createdAt": "2026-11-22T18:41:07Z",
+          "updatedAt": "2026-11-22T18:41:07Z"
+        },
+        {
+          "author": "b7n0de",
+          "authorAssociation": "NONE",
+          "body": "Thanks, Robin. That makes sense to me, and I see why you held off, since there's more than one way to do it.\n\n### A PR for Section 5.1\n\nIf it helps, I can open a PR for Section 5.1. It would say that a receipt whose path ends at a peak that has since been absorbed can still be checked against a later trusted accumulator.\n\n- **Two ways, both allowed.** The verifier could extend the receipt with a consistency proof from the earlier accumulator to the trusted one, or obtain a current receipt from the log.\n- **No single method.** The text wouldn't require either way, so implementations keep the choice.\n\nWould that work for you, or would you rather write it yourself?\n\nAssisted by little helpers.",
+          "createdAt": "2026-11-22T20:20:09Z",
+          "updatedAt": "2026-11-22T20:20:09Z"
+        }
+      ]
     }
   ],
   "pulls": [
