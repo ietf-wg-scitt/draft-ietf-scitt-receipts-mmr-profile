@@ -176,7 +176,7 @@ Other applications of this profile define their entry as a byte string, and `ent
 `ts-leaf-data` lets the transparency service commit, in each leaf, values it fixes when it appends the leaf, for example a time or a sequence number it assigns.
 This profile does not define those values.
 They are committed in `x`, not carried in a header parameter of a receipt, because a receipt is signed after the leaf is appended, possibly many times, and its header parameters are asserted at that signing.
-A value in `x` is fixed when the leaf is appended, and every later root commits to it.
+A value in `x` is set when the leaf is appended, and the root of every tree size that includes the leaf commits to it.
 
 A transparency service that commits nothing in a leaf uses the empty byte string as its `ts-leaf-data`.
 An inclusion proof for a leaf carries its `ts-leaf-data` ([](#inclusion-proofs)), and a verifier hashes it without interpreting it.
@@ -915,7 +915,8 @@ Verification therefore needs no check that an index is that of a leaf: a leaf va
 A verifier that accepts `entry-digest` or a leaf value from the presenter of a receipt, instead of computing them from the entry, establishes only that some node is in the tree, not that the entry is.
 
 The transparency service chooses `ts-leaf-data`, and its meaning is the transparency service's statement.
-It is fixed once the leaf is appended: a different `ts-leaf-data` for the same leaf gives a different tree, which a receipt of consistency from an earlier tree size exposes.
+A different `ts-leaf-data` for a leaf gives a different tree.
+A receipt of consistency exposes that only to a verifier whose trusted tree size includes the leaf: a tree size that does not include the leaf does not commit it, so trees that differ only in later leaves are both consistent with it.
 
 ## Declared tree sizes
 
