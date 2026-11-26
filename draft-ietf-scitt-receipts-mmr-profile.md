@@ -160,7 +160,8 @@ x = 0x00 || pos || H(ts-leaf-data) || entry-digest
 
 Each hash is the `H` identified by the `vds` value.
 With a node value size of `N` bytes, `x` is `2N + 9` bytes long and the pre-image of every interior node is `2N + 8` bytes, so for every `vds` value a leaf value equal to an interior node value is a collision in `H`.
-Because `x` includes `pos`, every leaf value binds the index of its leaf, including when the inclusion path is empty.
+Because `x` includes `pos`, every node value, leaf or interior, binds its position.
+A receipt of inclusion therefore binds the index of its leaf whatever the length of its inclusion path, and an empty path needs no special treatment.
 
 ## Entries
 
@@ -347,8 +348,7 @@ unprotected-header-map = {
 }
 ~~~~
 
-The payload of an inclusion proof signature is the tree peak committing to the leaf's inclusion, or the leaf value itself where the proof path is empty.
-The algorithm [included_root](#includedroot) obtains this value.
+The payload of an inclusion proof signature is the accumulator peak that commits the leaf, which [included_root](#includedroot) obtains.
 
 The payload MUST be detached.
 Detaching the payload forces verifiers to recompute the root from the inclusion proof,
@@ -357,7 +357,6 @@ this protects against implementation errors where the signature is verified but 
 ## Verifying the Receipt of inclusion
 
 A receipt of inclusion proves that an entry is recorded by the leaf at the index of the proof.
-The leaf value binds the index whether or not the inclusion path is empty; see [](#leaf-values).
 
 The verifier starts from the entry, for SCITT the candidate Signed Statement, and computes `entry-digest` from its bytes as [](#entries) describes.
 `entry-digest` MUST NOT be taken from the receipt.
@@ -375,7 +374,7 @@ Verification fails if any step fails.
 
 It is recommended that implementations return a single boolean result for Receipt verification operations, to reduce the chance of accepting a valid signature over an invalid inclusion proof.
 
-A verifier that holds a trusted tree size and accumulator can additionally check that the peak the path implies is the peak of that accumulator for the index, which fixes the length of the inclusion path.
+A verifier that holds a trusted tree size and accumulator can additionally check that the peak the path implies is one of the peaks of that accumulator, which ties the leaf to that tree size.
 When it does so, the protected `vds` value MUST equal the `vds` value of the trusted accumulator.
 
 ## included_root
@@ -910,7 +909,7 @@ The security considerations of {{-cose-receipts}} apply.
 ## Tree size of a receipt of inclusion
 
 A receipt of inclusion carries no tree size: it verifies in every later tree size, and alone does not tie the proven leaf to the history a verifier has established by receipts of consistency.
-When the inclusion path is empty the signature is over the leaf value alone; the index is still bound, because the leaf value commits `pos`.
+A verifier that needs that tie checks the peak against a trusted accumulator, as [](#verifying-the-receipt-of-inclusion) describes.
 
 ## Leaf value separation
 
