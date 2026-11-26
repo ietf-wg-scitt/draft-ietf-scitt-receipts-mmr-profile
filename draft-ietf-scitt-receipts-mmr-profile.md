@@ -161,7 +161,7 @@ x = 0x00 || pos || H(ts-leaf-data) || entry-digest
 Each hash is the `H` identified by the `vds` value.
 With a node value size of `N` bytes, `x` is `2N + 9` bytes long and the pre-image of every interior node is `2N + 8` bytes, so for every `vds` value a leaf value equal to an interior node value is a collision in `H`.
 Because `x` includes `pos`, every node value, leaf or interior, binds its position.
-A receipt of inclusion therefore binds the index of its leaf whatever the length of its inclusion path, and an empty path needs no special treatment.
+A receipt of inclusion therefore binds the index of the node it proves whatever the length of its inclusion path, and an empty path needs no special treatment.
 
 ## Entries
 
@@ -179,7 +179,7 @@ They are committed in `x`, not carried in a header parameter of a receipt, becau
 A value in `x` is fixed when the leaf is appended, and every later root commits to it.
 
 A transparency service that commits nothing in a leaf uses the empty byte string as its `ts-leaf-data`.
-Each inclusion proof carries the `ts-leaf-data` of its leaf ([](#inclusion-proofs)), and a verifier hashes it without interpreting it.
+An inclusion proof for a leaf carries its `ts-leaf-data` ([](#inclusion-proofs)), and a verifier hashes it without interpreting it.
 The protected header parameter ts-leaf-data-type ([](#cose-receipt-of-inclusion)) describes its format, for relying parties that interpret it.
 
 ## leaf_value
@@ -191,10 +191,6 @@ Given:
 - `i` the zero-based index of the leaf.
 - `ts_leaf_data` the ts-leaf-data of the leaf, possibly empty.
 - `entry_digest` the entry-digest of the entry the leaf records.
-
-And the constraints:
-
-- `index_height(i)` is 0.
 
 We define `leaf_value` as
 
@@ -228,15 +224,15 @@ inclusion-proof = bstr .cbor inclusion-proof-content
 
 inclusion-proof-content = [
 
-  ; zero-based index of a leaf
+  ; zero-based index of a tree node
   index: uint
 
-  ; path proving the leaf's inclusion,
-  ; empty when the leaf is a peak
+  ; path proving the node's inclusion,
+  ; empty when the node is a peak
   inclusion-path: [ * hash ]
 
-  ; the ts-leaf-data of the leaf,
-  ; absent when it is empty
+  ; the ts-leaf-data of the node when it
+  ; is a leaf, absent when it is empty
   ? ts-leaf-data: bstr
 ]
 ~~~~
@@ -245,6 +241,7 @@ Every element of an inclusion-path, a consistency-path or right-peaks is a node 
 The size of a node value is fixed by the `vds` value, see [](#verifiable-data-structure-values).
 A verifier MUST reject a proof in which any such element is not of that size.
 An absent ts-leaf-data is the empty byte string.
+Only the value of a leaf depends on ts-leaf-data, so a proof for an interior node does not carry it.
 
 Note that the inclusion path for the index leads to a single permanent node in the tree.
 This node will initially be a peak in the accumulator, as the tree grows it will eventually be "buried" by a new peak.
@@ -348,7 +345,7 @@ unprotected-header-map = {
 }
 ~~~~
 
-The payload of an inclusion proof signature is the accumulator peak that commits the leaf, which [included_root](#includedroot) obtains.
+The payload of an inclusion proof signature is the accumulator peak that commits the node, which [included_root](#includedroot) obtains.
 
 The payload MUST be detached.
 Detaching the payload forces verifiers to recompute the root from the inclusion proof,
@@ -356,25 +353,26 @@ this protects against implementation errors where the signature is verified but 
 
 ## Verifying the Receipt of inclusion
 
-A receipt of inclusion proves that an entry is recorded by the leaf at the index of the proof.
+A receipt of inclusion proves that a value is the node of the tree at the index of the proof.
+Verification is the same for every node, leaf or interior.
+Consistency proofs rely on this: a consistency path is the inclusion path of an origin peak in the later tree, and [consistent_roots](#consistentroots) proves each origin peak by applying [included_root](#includedroot) to its node value.
 
-The verifier starts from the entry, for SCITT the candidate Signed Statement, and computes `entry-digest` from its bytes as [](#entries) describes.
+To verify that an entry, for SCITT a candidate Signed Statement, is in the tree, the value is the value of its leaf: [leaf_value](#leafvalue) applied to the index, the ts-leaf-data of the proof and `entry-digest`, which the verifier computes from the bytes of the entry as [](#entries) describes.
 `entry-digest` MUST NOT be taken from the receipt.
 This defines how the inclusion proofs of this profile are consumed (Section 4.4.1 of {{-cose-receipts}}).
+The verifier does not need to check that the index is that of a leaf; see [](#leaf-value-separation).
 
 Perform the following, in order.
 Verification fails if any step fails.
 
 1. Decode the protected header. It MUST be deterministically encoded as required in [COSE Receipt of Consistency](#cose-receipt-of-consistency); the `vds` value MUST be one the verifier supports, see [Description of the Verifiable Data Structure](#description-of-the-verifiable-data-structure). Labels the verifier does not recognise are skipped.
 1. If ts-leaf-data-type is absent from the protected header, the ts-leaf-data of the proof MUST be empty.
-1. `index_height(index)` MUST be 0, so that the index is that of a leaf.
-1. Apply [leaf_value](#leafvalue) to the index, the ts-leaf-data of the proof and `entry-digest`. The result is the leaf value.
-1. Apply [included_root](#includedroot) to the index, the leaf value and the inclusion-path. The result is the peak the path implies.
+1. Apply [included_root](#includedroot) to the index, the value and the inclusion-path. The result is the peak the path implies.
 1. Set the COSE Sign1 payload to the bytes of that peak and verify the signature of the COSE Sign1.
 
 It is recommended that implementations return a single boolean result for Receipt verification operations, to reduce the chance of accepting a valid signature over an invalid inclusion proof.
 
-A verifier that holds a trusted tree size and accumulator can additionally check that the peak the path implies is one of the peaks of that accumulator, which ties the leaf to that tree size.
+A verifier that holds a trusted tree size and accumulator can additionally check that the peak the path implies is one of the peaks of that accumulator, which ties the node to that tree size.
 When it does so, the protected `vds` value MUST equal the `vds` value of the trusted accumulator.
 
 ## included_root
@@ -908,13 +906,14 @@ The security considerations of {{-cose-receipts}} apply.
 
 ## Tree size of a receipt of inclusion
 
-A receipt of inclusion carries no tree size: it verifies in every later tree size, and alone does not tie the proven leaf to the history a verifier has established by receipts of consistency.
+A receipt of inclusion carries no tree size: it verifies in every later tree size, and alone does not tie the proven node to the history a verifier has established by receipts of consistency.
 A verifier that needs that tie checks the peak against a trusted accumulator, as [](#verifying-the-receipt-of-inclusion) describes.
 
 ## Leaf value separation
 
 Leaf values are separated from interior values by the length of their pre-images, not by a prefix as in {{RFC9162}}.
 A leaf pre-image is `2N + 9` bytes and an interior pre-image is `2N + 8` bytes, so taking an interior node for a leaf, or a leaf for an interior node, requires a collision in `H`.
+Verification therefore needs no check that an index is that of a leaf: a leaf value at an interior index, or an interior node value at a leaf index, does not verify.
 A verifier that accepts `entry-digest` or a leaf value from the presenter of a receipt, instead of computing them from the entry, establishes only that some leaf is in the tree, not that the entry is.
 
 The transparency service chooses `ts-leaf-data`, and its meaning is the transparency service's statement.
