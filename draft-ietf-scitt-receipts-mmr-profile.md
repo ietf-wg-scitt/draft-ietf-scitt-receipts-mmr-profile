@@ -324,9 +324,7 @@ protected-header-map = {
 
 - alg (label: 1): REQUIRED. Signature algorithm identifier. Value type: int.
 - vds (label: 395): REQUIRED. verifiable data structure algorithm identifier, a value identifying the MMR defined in this document, such as MMR_SHA256, see [](#description-of-the-verifiable-data-structure). It fixes the hash algorithm `H`. Value type: int.
-- ts-leaf-data-type (label: TBD_3): OPTIONAL. The format of the ts-leaf-data of every leaf the receipt proves, see [](#transparency-service-leaf-data). The value has the syntax of the content type header parameter ({{RFC9052}}, Section 3.1): a CoAP Content-Format identifier or a media type. Verification does not use it. Value type: uint or tstr.
-
-ts-leaf-data-type need not be listed in crit: a verifier builds `x` from the ts-leaf-data bytes without interpreting them.
+- ts-leaf-data-type (label: TBD_3): OPTIONAL. The format of the ts-leaf-data of every leaf the receipt proves, see [](#transparency-service-leaf-data). The value has the syntax of the content type header parameter ({{RFC9052}}, Section 3.1): a CoAP Content-Format identifier or a media type. Verification does not use it, and it need not be listed in crit. Value type: uint or tstr.
 
 The protected header MUST meet the encoding requirements given in [COSE Receipt of Consistency](#cose-receipt-of-consistency), and a verifier MUST apply the same acceptance rules to it.
 
@@ -358,7 +356,7 @@ A receipt of inclusion proves that a value is the node of the tree at the index 
 Verification is the same for every node, leaf or interior.
 Consistency proofs rely on this: a consistency path is the inclusion path of an origin peak in the later tree, and [consistent_roots](#consistentroots) proves each origin peak by applying [included_root](#includedroot) to its node value.
 
-To verify that an entry, for SCITT a candidate Signed Statement, is in the tree, the value is the value of its leaf: [leaf_value](#leafvalue) applied to the index, the ts-leaf-data of the proof and `entry-digest`, which the verifier computes from the bytes of the entry as [](#entries) describes.
+To verify that an entry, for SCITT a candidate Signed Statement, is in the tree, the verifier uses the value of its leaf: [leaf_value](#leafvalue) applied to the index, the ts-leaf-data of the proof and `entry-digest`, which the verifier computes from the bytes of the entry as [](#entries) describes.
 `entry-digest` MUST NOT be taken from the receipt.
 This defines how the inclusion proofs of this profile are consumed (Section 4.4.1 of {{-cose-receipts}}).
 The verifier does not need to check that the index is that of a leaf; see [](#leaf-value-separation).
@@ -914,7 +912,7 @@ A verifier that needs that tie checks the peak against a trusted accumulator, as
 Leaf values are separated from interior values by the length of their pre-images, not by a prefix as in {{RFC9162}}.
 A leaf pre-image is `2N + 9` bytes and an interior pre-image is `2N + 8` bytes, so taking an interior node for a leaf, or a leaf for an interior node, requires a collision in `H`.
 Verification therefore needs no check that an index is that of a leaf: a leaf value at an interior index, or an interior node value at a leaf index, does not verify.
-A verifier that accepts `entry-digest` or a leaf value from the presenter of a receipt, instead of computing them from the entry, establishes only that some leaf is in the tree, not that the entry is.
+A verifier that accepts `entry-digest` or a leaf value from the presenter of a receipt, instead of computing them from the entry, establishes only that some node is in the tree, not that the entry is.
 
 The transparency service chooses `ts-leaf-data`, and its meaning is the transparency service's statement.
 It is fixed once the leaf is appended: a different `ts-leaf-data` for the same leaf gives a different tree, which a receipt of consistency from an earlier tree size exposes.
