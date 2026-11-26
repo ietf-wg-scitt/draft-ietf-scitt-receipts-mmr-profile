@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2026-11-24T08:41:14.209194+00:00",
+  "timestamp": "2026-11-26T07:03:36.869931+00:00",
   "repo": "ietf-wg-scitt/draft-ietf-scitt-receipts-mmr-profile",
   "labels": [
     {
@@ -742,7 +742,7 @@
       "labels": [],
       "body": "[Section 11.1 of -00](https://www.ietf.org/archive/id/draft-ietf-scitt-receipts-mmr-profile-00.html#section-11.1) says that a receipt of inclusion carries no tree size and verifies in every later tree size. [Section 5.1](https://www.ietf.org/archive/id/draft-ietf-scitt-receipts-mmr-profile-00.html#section-5.1) lets a verifier that holds a trusted tree size and accumulator check that the peak implied by the inclusion path matches the accumulator peak for the index at that size.\n\n### Question\n\nSuppose a receipt was issued while its node sat under a peak that has since been absorbed into a higher peak. Its path then ends at a node that is no longer a peak of the trusted accumulator, so the additional check in 5.1 fails, although the receipt is genuine. Should 5.1 say how a verifier establishes inclusion in its trusted state in that case, for example using retained consistency paths from a trusted state in which the earlier peak was still a peak, or by obtaining a current receipt?\n\n### Not claimed\n\nWe have no MMR reader yet, so none of this is measured against the profile. The question comes from reading the text of -00.\n\nAssisted by little helpers.",
       "createdAt": "2026-11-21T21:21:49Z",
-      "updatedAt": "2026-11-22T20:20:09Z",
+      "updatedAt": "2026-11-25T20:01:22Z",
       "closedAt": null,
       "comments": [
         {
@@ -758,6 +758,86 @@
           "body": "Thanks, Robin. That makes sense to me, and I see why you held off, since there's more than one way to do it.\n\n### A PR for Section 5.1\n\nIf it helps, I can open a PR for Section 5.1. It would say that a receipt whose path ends at a peak that has since been absorbed can still be checked against a later trusted accumulator.\n\n- **Two ways, both allowed.** The verifier could extend the receipt with a consistency proof from the earlier accumulator to the trusted one, or obtain a current receipt from the log.\n- **No single method.** The text wouldn't require either way, so implementations keep the choice.\n\nWould that work for you, or would you rather write it yourself?\n\nAssisted by little helpers.",
           "createdAt": "2026-11-22T20:20:09Z",
           "updatedAt": "2026-11-22T20:20:09Z"
+        },
+        {
+          "author": "robinbryce",
+          "authorAssociation": "COLLABORATOR",
+          "body": "I'd like to have \"No single method\" to give implementors the choice. And I would like to at least avoid requiring that the verifier needs to \"contact the log\" for either data or a current receipt. \n\nGiven any replica of the log data, the verifier can easily extend the receipt to reach the peak of the current trusted accumulator. Having the draft be proscriptive in the **source** of the data would undermine the property that all replicas of the log are equally trusted, including the verifiers own replica if they choose to keep one.\n\nSimilarly, if the log signs the peaks of each new trusted accumulator, there is no need to contact the log for a fresh receipt. The signature over the peak is effectively a pre-signed receipt for all nodes under that peak and the proof data can come from any source.\n\nA consistency proof from the previous accumulator to the new one is a great source for the necessary data, and getting a \"fresh receipt\" from the log is perfectly reasonable. I'm reluctant to specify that as the \"only valid ways\"\n\nDo people generally think we need a more proscriptive form for interop reaons ? ",
+          "createdAt": "2026-11-25T11:01:42Z",
+          "updatedAt": "2026-11-25T11:01:42Z"
+        },
+        {
+          "author": "b7n0de",
+          "authorAssociation": "NONE",
+          "body": "I appreciate the clarification, Robin. I agree that there should be no single method and that the verifier should not have to contact the log.\n\n### A non-normative paragraph for Section 5.1\n\nIf it helps, the PR could add one non-normative paragraph and nothing normative. It would say that a verifier can check the original receipt and use additional path data to check inclusion against a later trusted accumulator, even if the original peak has since been absorbed. It could mention several ways to obtain or use the necessary data.\n\n- **A consistency proof.** The path from the earlier peak to the trusted accumulator can supply the additional nodes.\n- **A replica of the log data.** The verifier can obtain the nodes from a replica, including its own.\n- **A current receipt.** The verifier can obtain a current receipt from the log.\n- **Signed peaks.** If the log signs each new trusted accumulator peak, the verifier can use the signed peak with path data from any source.\n\nNone of these would be required, and the list would not claim to be complete. Happy to open it if that works for you.\n\nAssisted by little helpers.\n",
+          "createdAt": "2026-11-25T14:05:34Z",
+          "updatedAt": "2026-11-25T14:05:34Z"
+        },
+        {
+          "author": "robinbryce",
+          "authorAssociation": "COLLABORATOR",
+          "body": "\n> None of these would be required, and the list would not claim to be complete. Happy to open it if that works for you.\nOh, yes please. That would be welcome. Please do human eyeball review the work the \"little helpers\" though :-)\n",
+          "createdAt": "2026-11-25T17:58:25Z",
+          "updatedAt": "2026-11-25T17:58:25Z"
+        },
+        {
+          "author": "b7n0de",
+          "authorAssociation": "NONE",
+          "body": "Will do, thanks Robin.\n### The PR\n\n- **Scope.** One non-normative paragraph for Section 5.1, with nothing required and no claim to be complete.\n\nAssisted by little helpers, eyeballed by a human ;-)\n",
+          "createdAt": "2026-11-25T20:01:22Z",
+          "updatedAt": "2026-11-25T20:01:22Z"
+        }
+      ]
+    },
+    {
+      "number": 69,
+      "id": "I_kwDOO_kfWc8AAAABiMk0kg",
+      "title": "Leaf value for a registered SCITT Signed Statement is not defined (follow-up to #26)",
+      "url": "https://github.com/ietf-wg-scitt/draft-ietf-scitt-receipts-mmr-profile/issues/69",
+      "state": "OPEN",
+      "author": "bassem0001",
+      "authorAssociation": "NONE",
+      "assignees": [],
+      "labels": [],
+      "body": "**Problem**\n\n#26 was closed with the leaf pre-image `x` left to the application (-00 Sections 5.1, 8.2, 10, 11.2). That suits the profile's verifier, which starts from a node value. A SCITT relying party starts from a Signed Statement and has to derive that value itself. `vds` fixes `H` but not `x`, so checking a Receipt from an MMR_SHA256 service needs a per-service leaf rule that no specification or signed field supplies. RFC 9942 Section 4.4.1 requires a profile to define how its proofs are consumed. The CCF profile (-06, Sections 2.2 and 3.2) does this down to the Signed Statement bytes; the digest \"MUST NOT be taken from the receipt\".\n\n**Raised by**\n\nJustin Dobson (SCITT list, 21 Nov 2026) asked that 11.2 give one concrete leaf form. Andre Neumann (24 Nov 2026) verified the path and signature of a Receipt from Justin's public log but could not derive the leaf from the logged record until Justin posted the rule. That log's entries are not Signed Statements; the point is that the rule travelled out of band.\n\n**Suggested fix**\n\n1. Minimum (Justin's request): 11.2 gives one worked form as an informative example, e.g. his `H(0x00 || tag || position as 8 bytes BE || entry digest)`, with a known-answer value. I can add the vector to `tools/known-answers.json` once #66 lands. This alone does not solve the problem above.\n2. Add a rule for SCITT to 5.1: for a registered Signed Statement, `x` is the COSE_Sign1 with tag 18 (RFC 9943 Section 6.1) and an empty unprotected header (Section 6.3), other elements as submitted; the verifier computes `H(x)` itself. `H(x)` is what CCF calls data-hash; here it is the leaf value. For MMR_SHA256 such an `x` is longer than the 72-byte interior pre-image (the signature alone is at least 64 bytes), which meets 11.2's advice. It does not bind the position on an empty path; the accumulator check in 5.1 remains.\n3. If services keep their own leaf forms: identify the form by a protected header parameter listed in `crit`, so a verifier can report \"unknown leaf rule\" rather than \"not included\".\n\n2 and 3 are design changes for the WG to decide.\n\n---\nSection numbers refer to draft-ietf-scitt-receipts-mmr-profile-00.\n",
+      "createdAt": "2026-11-24T19:36:53Z",
+      "updatedAt": "2026-11-26T05:16:09Z",
+      "closedAt": null,
+      "comments": [
+        {
+          "author": "b7n0de",
+          "authorAssociation": "NONE",
+          "body": "I agree that the MMR profile needs to specify how a relying party derives the leaf from a Signed Statement.\n\nSuggested fix 2 looks like a good fit for SCITT. It would use the tagged COSE_Sign1 with an empty unprotected header as the input to the leaf hash, so the same bytes could also be used to identify that exact encoded object.\n\nOur individual draft, Section 4.5, makes this a requirement on the selected VDS specification when identification depends on a leaf hash or Receipt, and cites the same RFC 9942 Section 4.4.1 requirement on consuming proofs (https://datatracker.ietf.org/doc/draft-gruszka-scitt-statement-identification-05).\n\nAssisted by little helpers.",
+          "createdAt": "2026-11-24T23:04:36Z",
+          "updatedAt": "2026-11-24T23:04:36Z"
+        },
+        {
+          "author": "robinbryce",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Yes, I'd like to do this too \"If services keep their own leaf forms: identify the form by a protected header parameter listed in crit, so a verifier can report\". because in the implementations I've experimented with, having an application specific contribution to the leaf pre-image is helpful, particularly for the \"empty path\" position binding issue",
+          "createdAt": "2026-11-25T10:47:17Z",
+          "updatedAt": "2026-11-25T10:48:35Z"
+        },
+        {
+          "author": "bassem0001",
+          "authorAssociation": "NONE",
+          "body": "Thanks, Robin and Konrad. A sketch combining fixes 2 and 3:\n\n- `leaf-form`: a protected header parameter of a receipt of inclusion, label TBD (private use until assigned, as for `tree-size-2` in Section 7). It identifies how `x` is built; all proofs in one receipt share one form.\n- One value defined here: the registered Signed Statement, tag 18, empty unprotected header, with `H(x)` as the leaf value. A receipt whose `x` has this form MUST carry the parameter. An application-specific pre-image, such as one that binds the position for the empty-path case, uses another value.\n- Listed in `crit`, as you suggested, unlike `tree-size-2`: a verifier that doesn't know the label fails the receipt (RFC 9052 Section 3.1) instead of applying its own rule. That includes a 5.1 verifier that never builds `x`, but only receipts carrying the parameter are affected.\n\nTwo questions before I write text:\n\n1. Mandatory in every receipt of inclusion, as RFC 9942 Section 4.4 encourages for added protected parameters, or optional, with `x` application-defined when absent, as in -00?\n2. Other values: an IANA registry, or a text value (a URI, say) that the service documents?\n\nRFC 9942 Section 4.4 also mentions `typ`, but `typ` types the whole receipt (RFC 9596), so I'd define a new parameter. I can open a PR; the known-answer vector follows #66.",
+          "createdAt": "2026-11-25T21:03:50Z",
+          "updatedAt": "2026-11-25T21:03:50Z"
+        },
+        {
+          "author": "b7n0de",
+          "authorAssociation": "NONE",
+          "body": "Thanks, Bassem, the sketch reads well to me.\n\n### On your two questions\n\n- **Mandatory or optional.** I'd make `leaf-form` mandatory in every receipt of inclusion, as RFC 9942 Section 4.4 encourages for added protected header parameters. If it stays optional, the case where two implementations build `x` differently stays application-defined, and that is the gap this issue is about. In the implementations Robin experimented with, an application-specific contribution to the leaf pre-image was helpful, so I'm open to Robin's view on whether this holds in practice.\n- **Other values.** Both, as with `content type` in RFC 9052 Section 3.1, which takes an integer from an IANA registry or a text value. Here the text value could be a URI that the service documents.\n\nAssisted by little helpers.",
+          "createdAt": "2026-11-26T00:30:43Z",
+          "updatedAt": "2026-11-26T00:30:43Z"
+        },
+        {
+          "author": "bassem0001",
+          "authorAssociation": "NONE",
+          "body": "Thanks, Konrad. That works for me: mandatory, integer from a registry or a text value.\n\nOne consequence: if it's mandatory, I'd leave it out of `crit`, like tree-size-2 in Section 7. A receipt without it is rejected anyway, and `crit` would only make -00 5.1 verifiers reject receipts they verify correctly. A verifier that knows the label but not the value rejects the receipt and reports the leaf rule as unknown.\n\n@robinbryce, does mandatory without `crit` work for you? I'll open a PR on that basis; easy to adjust in review.",
+          "createdAt": "2026-11-26T05:16:09Z",
+          "updatedAt": "2026-11-26T05:16:09Z"
         }
       ]
     }
