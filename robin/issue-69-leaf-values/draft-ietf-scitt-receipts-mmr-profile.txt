@@ -280,8 +280,8 @@ Table of Contents
    values.  They are committed in x, not carried in a header parameter
    of a receipt, because a receipt is signed after the leaf is appended,
    possibly many times, and its header parameters are asserted at that
-   signing.  A value in x is fixed when the leaf is appended, and every
-   later root commits to it.
+   signing.  A value in x is set when the leaf is appended, and the root
+   of every tree size that includes the leaf commits to it.
 
    A transparency service that commits nothing in a leaf uses the empty
    byte string as its ts-leaf-data.  An inclusion proof for a leaf
@@ -1171,10 +1171,11 @@ Table of Contents
    in the tree, not that the entry is.
 
    The transparency service chooses ts-leaf-data, and its meaning is the
-   transparency service's statement.  It is fixed once the leaf is
-   appended: a different ts-leaf-data for the same leaf gives a
-   different tree, which a receipt of consistency from an earlier tree
-   size exposes.
+   transparency service's statement.  A different ts-leaf-data for a
+   leaf gives a different tree.  A receipt of consistency exposes that
+   only to a verifier whose trusted tree size includes the leaf: a tree
+   size that does not include the leaf does not commit it, so trees that
+   differ only in later leaves are both consistent with it.
 
 12.3.  Declared tree sizes
 
