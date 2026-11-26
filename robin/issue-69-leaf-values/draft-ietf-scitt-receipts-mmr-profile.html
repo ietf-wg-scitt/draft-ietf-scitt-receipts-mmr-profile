@@ -1659,13 +1659,12 @@ protected-header-map = {
           <p id="section-6-3.2.1">vds (label: 395): <span class="bcp14">REQUIRED</span>. verifiable data structure algorithm identifier, a value identifying the MMR defined in this document, such as MMR_SHA256, see <a href="#description-of-the-verifiable-data-structure" class="auto internal xref">Section 3</a>. It fixes the hash algorithm <code>H</code>. Value type: int.<a href="#section-6-3.2.1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-6-3.3">
-          <p id="section-6-3.3.1">ts-leaf-data-type (label: TBD_3): <span class="bcp14">OPTIONAL</span>. The format of the ts-leaf-data of every leaf the receipt proves, see <a href="#transparency-service-leaf-data" class="auto internal xref">Section 4.2</a>. The value has the syntax of the content type header parameter (<span>[<a href="#RFC9052" class="cite xref">RFC9052</a>]</span>, Section 3.1): a CoAP Content-Format identifier or a media type. Verification does not use it. Value type: uint or tstr.<a href="#section-6-3.3.1" class="pilcrow">¶</a></p>
+          <p id="section-6-3.3.1">ts-leaf-data-type (label: TBD_3): <span class="bcp14">OPTIONAL</span>. The format of the ts-leaf-data of every leaf the receipt proves, see <a href="#transparency-service-leaf-data" class="auto internal xref">Section 4.2</a>. The value has the syntax of the content type header parameter (<span>[<a href="#RFC9052" class="cite xref">RFC9052</a>]</span>, Section 3.1): a CoAP Content-Format identifier or a media type. Verification does not use it, and it need not be listed in crit. Value type: uint or tstr.<a href="#section-6-3.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-6-4">ts-leaf-data-type need not be listed in crit: a verifier builds <code>x</code> from the ts-leaf-data bytes without interpreting them.<a href="#section-6-4" class="pilcrow">¶</a></p>
-<p id="section-6-5">The protected header <span class="bcp14">MUST</span> meet the encoding requirements given in <span><a href="#cose-receipt-of-consistency" class="internal xref">COSE Receipt of Consistency</a> (<a href="#cose-receipt-of-consistency" class="auto internal xref">Section 8</a>)</span>, and a verifier <span class="bcp14">MUST</span> apply the same acceptance rules to it.<a href="#section-6-5" class="pilcrow">¶</a></p>
-<p id="section-6-6">The unprotected header for an inclusion proof signature is:<a href="#section-6-6" class="pilcrow">¶</a></p>
-<div class="lang-cddl sourcecode" id="section-6-7">
+<p id="section-6-4">The protected header <span class="bcp14">MUST</span> meet the encoding requirements given in <span><a href="#cose-receipt-of-consistency" class="internal xref">COSE Receipt of Consistency</a> (<a href="#cose-receipt-of-consistency" class="auto internal xref">Section 8</a>)</span>, and a verifier <span class="bcp14">MUST</span> apply the same acceptance rules to it.<a href="#section-6-4" class="pilcrow">¶</a></p>
+<p id="section-6-5">The unprotected header for an inclusion proof signature is:<a href="#section-6-5" class="pilcrow">¶</a></p>
+<div class="lang-cddl sourcecode" id="section-6-6">
 <pre>
 inclusion-proofs = [ + inclusion-proof ]
 
@@ -1677,12 +1676,12 @@ unprotected-header-map = {
   &amp;(vdp: 396) =&gt; verifiable-proofs
   * cose-label =&gt; cose-value
 }
-</pre><a href="#section-6-7" class="pilcrow">¶</a>
+</pre><a href="#section-6-6" class="pilcrow">¶</a>
 </div>
-<p id="section-6-8">The payload of an inclusion proof signature is the accumulator peak that commits the node, which <span><a href="#includedroot" class="internal xref">included_root</a> (<a href="#includedroot" class="auto internal xref">Section 6.2</a>)</span> obtains.<a href="#section-6-8" class="pilcrow">¶</a></p>
-<p id="section-6-9">The payload <span class="bcp14">MUST</span> be detached.
+<p id="section-6-7">The payload of an inclusion proof signature is the accumulator peak that commits the node, which <span><a href="#includedroot" class="internal xref">included_root</a> (<a href="#includedroot" class="auto internal xref">Section 6.2</a>)</span> obtains.<a href="#section-6-7" class="pilcrow">¶</a></p>
+<p id="section-6-8">The payload <span class="bcp14">MUST</span> be detached.
 Detaching the payload forces verifiers to recompute the root from the inclusion proof,
-this protects against implementation errors where the signature is verified but the payload merkle root does not match the inclusion proof.<a href="#section-6-9" class="pilcrow">¶</a></p>
+this protects against implementation errors where the signature is verified but the payload merkle root does not match the inclusion proof.<a href="#section-6-8" class="pilcrow">¶</a></p>
 <div id="verifying-the-receipt-of-inclusion">
 <section id="section-6.1">
         <h3 id="name-verifying-the-receipt-of-in">
@@ -1691,7 +1690,7 @@ this protects against implementation errors where the signature is verified but 
 <p id="section-6.1-1">A receipt of inclusion proves that a value is the node of the tree at the index of the proof.
 Verification is the same for every node, leaf or interior.
 Consistency proofs rely on this: a consistency path is the inclusion path of an origin peak in the later tree, and <span><a href="#consistentroots" class="internal xref">consistent_roots</a> (<a href="#consistentroots" class="auto internal xref">Section 8.1.1</a>)</span> proves each origin peak by applying <span><a href="#includedroot" class="internal xref">included_root</a> (<a href="#includedroot" class="auto internal xref">Section 6.2</a>)</span> to its node value.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.1-2">To verify that an entry, for SCITT a candidate Signed Statement, is in the tree, the value is the value of its leaf: <span><a href="#leafvalue" class="internal xref">leaf_value</a> (<a href="#leafvalue" class="auto internal xref">Section 4.3</a>)</span> applied to the index, the ts-leaf-data of the proof and <code>entry-digest</code>, which the verifier computes from the bytes of the entry as <a href="#entries" class="auto internal xref">Section 4.1</a> describes.
+<p id="section-6.1-2">To verify that an entry, for SCITT a candidate Signed Statement, is in the tree, the verifier uses the value of its leaf: <span><a href="#leafvalue" class="internal xref">leaf_value</a> (<a href="#leafvalue" class="auto internal xref">Section 4.3</a>)</span> applied to the index, the ts-leaf-data of the proof and <code>entry-digest</code>, which the verifier computes from the bytes of the entry as <a href="#entries" class="auto internal xref">Section 4.1</a> describes.
 <code>entry-digest</code> <span class="bcp14">MUST NOT</span> be taken from the receipt.
 This defines how the inclusion proofs of this profile are consumed (Section 4.4.1 of <span>[<a href="#RFC9942" class="cite xref">RFC9942</a>]</span>).
 The verifier does not need to check that the index is that of a leaf; see <a href="#leaf-value-separation" class="auto internal xref">Section 12.2</a>.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
@@ -2413,7 +2412,7 @@ A verifier that needs that tie checks the peak against a trusted accumulator, as
 <p id="section-12.2-1">Leaf values are separated from interior values by the length of their pre-images, not by a prefix as in <span>[<a href="#RFC9162" class="cite xref">RFC9162</a>]</span>.
 A leaf pre-image is <code>2N + 9</code> bytes and an interior pre-image is <code>2N + 8</code> bytes, so taking an interior node for a leaf, or a leaf for an interior node, requires a collision in <code>H</code>.
 Verification therefore needs no check that an index is that of a leaf: a leaf value at an interior index, or an interior node value at a leaf index, does not verify.
-A verifier that accepts <code>entry-digest</code> or a leaf value from the presenter of a receipt, instead of computing them from the entry, establishes only that some leaf is in the tree, not that the entry is.<a href="#section-12.2-1" class="pilcrow">¶</a></p>
+A verifier that accepts <code>entry-digest</code> or a leaf value from the presenter of a receipt, instead of computing them from the entry, establishes only that some node is in the tree, not that the entry is.<a href="#section-12.2-1" class="pilcrow">¶</a></p>
 <p id="section-12.2-2">The transparency service chooses <code>ts-leaf-data</code>, and its meaning is the transparency service's statement.
 It is fixed once the leaf is appended: a different <code>ts-leaf-data</code> for the same leaf gives a different tree, which a receipt of consistency from an earlier tree size exposes.<a href="#section-12.2-2" class="pilcrow">¶</a></p>
 </section>

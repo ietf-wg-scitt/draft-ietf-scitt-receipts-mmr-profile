@@ -444,11 +444,8 @@ Table of Contents
       leaf-data of every leaf the receipt proves, see Section 4.2.  The
       value has the syntax of the content type header parameter
       ([RFC9052], Section 3.1): a CoAP Content-Format identifier or a
-      media type.  Verification does not use it.  Value type: uint or
-      tstr.
-
-   ts-leaf-data-type need not be listed in crit: a verifier builds x
-   from the ts-leaf-data bytes without interpreting them.
+      media type.  Verification does not use it, and it need not be
+      listed in crit.  Value type: uint or tstr.
 
    The protected header MUST meet the encoding requirements given in
    COSE Receipt of Consistency (Section 8), and a verifier MUST apply
@@ -485,7 +482,7 @@ Table of Contents
    included_root (Section 6.2) to its node value.
 
    To verify that an entry, for SCITT a candidate Signed Statement, is
-   in the tree, the value is the value of its leaf: leaf_value
+   in the tree, the verifier uses the value of its leaf: leaf_value
    (Section 4.3) applied to the index, the ts-leaf-data of the proof and
    entry-digest, which the verifier computes from the bytes of the entry
    as Section 4.1 describes. entry-digest MUST NOT be taken from the
@@ -1170,7 +1167,7 @@ Table of Contents
    is that of a leaf: a leaf value at an interior index, or an interior
    node value at a leaf index, does not verify.  A verifier that accepts
    entry-digest or a leaf value from the presenter of a receipt, instead
-   of computing them from the entry, establishes only that some leaf is
+   of computing them from the entry, establishes only that some node is
    in the tree, not that the entry is.
 
    The transparency service chooses ts-leaf-data, and its meaning is the
