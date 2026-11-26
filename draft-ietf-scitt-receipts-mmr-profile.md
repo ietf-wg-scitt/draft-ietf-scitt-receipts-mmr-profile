@@ -153,7 +153,7 @@ The value of every leaf is `f = H(x)`, where the leaf pre-image `x` is
 x = 0x00 || pos || H(ts-leaf-data) || entry-digest
 ~~~~
 
-- `0x00` is a single zero byte, identifying this form of leaf pre-image.
+- `0x00` is a single zero byte, which makes `x` one byte longer than any interior pre-image.
 - `pos` is the position of the leaf, `i + 1`, as 8 bytes big-endian, as for interior nodes.
 - `ts-leaf-data` is a byte string, possibly empty, that the transparency service fixes when it appends the leaf; see [](#transparency-service-leaf-data).
 - `entry-digest` is `H` applied to the bytes of the entry the leaf records; see [](#entries).
@@ -180,7 +180,8 @@ A value in `x` is fixed when the leaf is appended, and every later root commits 
 
 A transparency service that commits nothing in a leaf uses the empty byte string as its `ts-leaf-data`.
 An inclusion proof for a leaf carries its `ts-leaf-data` ([](#inclusion-proofs)), and a verifier hashes it without interpreting it.
-The protected header parameter ts-leaf-data-type ([](#cose-receipt-of-inclusion)) describes its format, for relying parties that interpret it.
+The protected header parameter ts-leaf-data-type ([](#cose-receipt-of-inclusion)) can describe its format, for relying parties that interpret it.
+An auditor that recomputes the leaves of the log needs the `ts-leaf-data` of every leaf, so a transparency service that expects to be audited publishes it with its entries.
 
 ## leaf_value
 
@@ -323,7 +324,7 @@ protected-header-map = {
 
 - alg (label: 1): REQUIRED. Signature algorithm identifier. Value type: int.
 - vds (label: 395): REQUIRED. verifiable data structure algorithm identifier, a value identifying the MMR defined in this document, such as MMR_SHA256, see [](#description-of-the-verifiable-data-structure). It fixes the hash algorithm `H`. Value type: int.
-- ts-leaf-data-type (label: TBD_3): OPTIONAL. The format of the ts-leaf-data of every leaf the receipt proves, see [](#transparency-service-leaf-data). The value has the syntax of the content type header parameter ({{RFC9052}}, Section 3.1): a CoAP Content-Format identifier or a media type. application/octet-stream (Content-Format 42) declares ts-leaf-data that the transparency service does not otherwise describe. When ts-leaf-data-type is absent, the ts-leaf-data of every proof in the receipt MUST be empty. Value type: uint or tstr.
+- ts-leaf-data-type (label: TBD_3): OPTIONAL. The format of the ts-leaf-data of every leaf the receipt proves, see [](#transparency-service-leaf-data). The value has the syntax of the content type header parameter ({{RFC9052}}, Section 3.1): a CoAP Content-Format identifier or a media type. Verification does not use it. Value type: uint or tstr.
 
 ts-leaf-data-type need not be listed in crit: a verifier builds `x` from the ts-leaf-data bytes without interpreting them.
 
@@ -366,7 +367,6 @@ Perform the following, in order.
 Verification fails if any step fails.
 
 1. Decode the protected header. It MUST be deterministically encoded as required in [COSE Receipt of Consistency](#cose-receipt-of-consistency); the `vds` value MUST be one the verifier supports, see [Description of the Verifiable Data Structure](#description-of-the-verifiable-data-structure). Labels the verifier does not recognise are skipped.
-1. If ts-leaf-data-type is absent from the protected header, the ts-leaf-data of the proof MUST be empty.
 1. Apply [included_root](#includedroot) to the index, the value and the inclusion-path. The result is the peak the path implies.
 1. Set the COSE Sign1 payload to the bytes of that peak and verify the signature of the COSE Sign1.
 
