@@ -5,7 +5,7 @@
 SCITT                                                           R. Bryce
 Internet-Draft                                                          
 Intended status: Standards Track                               J. Geater
-Expires: 30 May 2027                                    26 November 2026
+Expires: 31 May 2027                                    27 November 2026
 
 
                          COSE Receipts for MMRs
@@ -37,7 +37,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 May 2027.
+   This Internet-Draft will expire on 31 May 2027.
 
 Copyright Notice
 
@@ -285,11 +285,13 @@ Table of Contents
 
    A transparency service that commits nothing in a leaf uses the empty
    byte string as its ts-leaf-data.  An inclusion proof for a leaf
-   carries its ts-leaf-data (Section 5), and a verifier hashes it
-   without interpreting it.  The protected header parameter ts-leaf-
-   data-type (Section 6) can describe its format, for relying parties
-   that interpret it.  An auditor that recomputes the leaves of the log
-   needs the ts-leaf-data of every leaf, so a transparency service that
+   carries its ts-leaf-data when it is not empty (Section 5), and a
+   verifier hashes it without interpreting it.  A transparency service
+   that wants its ts-leaf-data to identify its own format can begin it
+   with a type or version byte; that byte is committed with the rest of
+   the leaf when it is appended, so it cannot disagree with the bytes it
+   describes.  An auditor that recomputes the leaves of the log needs
+   the ts-leaf-data of every leaf, so a transparency service that
    expects to be audited publishes it with its entries.
 
 4.3.  leaf_value
@@ -350,8 +352,10 @@ Table of Contents
    is a node value.  The size of a node value is fixed by the vds value,
    see Table 1.  A verifier MUST reject a proof in which any such
    element is not of that size.  An absent ts-leaf-data is the empty
-   byte string.  Only the value of a leaf depends on ts-leaf-data, so a
-   proof for an interior node does not carry it.
+   byte string.  A transparency service MUST omit ts-leaf-data when it
+   is empty, so that an inclusion proof has one encoding.  Only the
+   value of a leaf depends on ts-leaf-data, so a proof for an interior
+   node does not carry it.
 
    Note that the inclusion path for the index leads to a single
    permanent node in the tree.  This node will initially be a peak in
@@ -427,8 +431,6 @@ Table of Contents
    protected-header-map = {
      &(alg: 1) => int
      &(vds: 395) => int ; e.g. MMR_SHA256 (TBD_1)
-     ; TBD_3, private use until assigned
-     ? &(ts-leaf-data-type: -65934) => uint / tstr
      * cose-label => cose-value
    }
 
@@ -439,13 +441,6 @@ Table of Contents
       identifier, a value identifying the MMR defined in this document,
       such as MMR_SHA256, see Section 3.  It fixes the hash algorithm H.
       Value type: int.
-
-   *  ts-leaf-data-type (label: TBD_3): OPTIONAL.  The format of the ts-
-      leaf-data of every leaf the receipt proves, see Section 4.2.  The
-      value has the syntax of the content type header parameter
-      ([RFC9052], Section 3.1): a CoAP Content-Format identifier or a
-      media type.  Verification does not use it, and it need not be
-      listed in crit.  Value type: uint or tstr.
 
    The protected header MUST meet the encoding requirements given in
    COSE Receipt of Consistency (Section 8), and a verifier MUST apply
@@ -1255,7 +1250,7 @@ Table of Contents
 
 13.1.3.  COSE Header Parameters
 
-   IANA is requested to add the following entries to the "COSE Header
+   IANA is requested to add the following entry to the "COSE Header
    Parameters" registry established by [RFC9053], in the Specification
    Required range:
 
@@ -1274,22 +1269,6 @@ Table of Contents
 
    Until this label is assigned, implementations use the private use
    value -65933 for tree-size-2.
-
-   *  Name: ts-leaf-data-type
-
-   *  Label: TBD_3
-
-   *  Value Type: uint / tstr
-
-   *  Value Registry: CoAP Content-Formats, or Media Types
-
-   *  Description: The format of the ts-leaf-data of the leaves a
-      receipt of inclusion proves
-
-   *  Reference: RFCthis
-
-   Until this label is assigned, implementations use the private use
-   value -65934 for ts-leaf-data-type.
 
 13.2.  New Registries
 
