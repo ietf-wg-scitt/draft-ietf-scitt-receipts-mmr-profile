@@ -30,6 +30,8 @@ normative:
   RFC9052:
   RFC9053: COSE
   RFC9942: cose-receipts
+  RFC9943:
+  I-D.ietf-scitt-receipts-ccf-profile: ccf-profile
   FIPS180-4:
     title: "Secure Hash Standard (SHS)"
     target: https://doi.org/10.6028/NIST.FIPS.180-4
@@ -41,7 +43,6 @@ normative:
 informative:
   RFC9054:
   RFC9162:
-  RFC9943:
   ReyzinYakoubov:
     title: "Efficient Asynchronous Accumulators for Distributed PKI"
     target: https://eprint.iacr.org/2015/718.pdf
@@ -112,7 +113,7 @@ The technical advantages of post-order traversal binary Merkle trees are discuss
 
 - A complete MMR(n) defines an mmr with n nodes where no equal height sibling trees exist. MMR(n) is complete if and only if `index_height(n)` is 0, that is, the node that would be stored at index n is a leaf.
 - `i` shall be the zero-based index of any node, including leaf nodes, in the MMR. Nodes are assigned indices in the order they are appended to the linear array.
-- `pos` shall be the one-based position of a node, `pos = i + 1`. The position is included in the hash of each interior node (see hash_pospair64), binding each interior node's value to its location in the tree.
+- `pos` shall be the one-based position of a node, `pos = i + 1`. The position is included in the hash of every node, leaf and interior (see [Leaf Values](#leaf-values) and hash_pospair64), binding each node's value to its location in the tree.
 - g shall be the zero-based height of a node in the tree.
 - `H(x)` shall be the digest of any value x using the hash algorithm identified by the `vds` value, for example SHA-256 for MMR_SHA256; see [Description of the Verifiable Data Structure](#description-of-the-verifiable-data-structure).
 - `||` shall mean concatenation of raw byte representations of the referenced values.
@@ -144,6 +145,73 @@ The `vds` value in the protected header of a receipt fixes `H` and the node valu
 The hash algorithm of the tree is declared only by the `vds` value.
 A verifier MUST reject a receipt whose `vds` value it does not support.
 
+# Leaf Values
+
+The value of every leaf is `f = H(x)`, where the leaf pre-image `x` is
+
+~~~~
+x = 0x00 || pos || H(ts-leaf-data) || entry-digest
+~~~~
+
+- `0x00` is a single zero byte, which makes `x` one byte longer than any interior pre-image.
+- `pos` is the position of the leaf, `i + 1`, as 8 bytes big-endian, as for interior nodes.
+- `ts-leaf-data` is a byte string, possibly empty, that the transparency service fixes when it appends the leaf; see [](#transparency-service-leaf-data).
+- `entry-digest` is `H` applied to the bytes of the entry the leaf records; see [](#entries).
+
+Each hash is the `H` identified by the `vds` value.
+With a node value size of `N` bytes, `x` is `2N + 9` bytes long and the pre-image of every interior node is `2N + 8` bytes, so for every `vds` value a leaf value equal to an interior node value is a collision in `H`.
+Because `x` includes `pos`, every node value, leaf or interior, binds its position.
+A receipt of inclusion therefore binds the index of the node it proves whatever the length of its inclusion path, and an empty path needs no special treatment.
+
+## Entries
+
+For a Signed Statement registered by a Transparency Service ({{RFC9943}}), the entry is the Signed Statement as registered, and `entry-digest` is the data-hash defined in Section 2.2 of {{-ccf-profile}}, computed with `H`: the digest of the COSE_Sign1 encoding with CBOR tag 18 retained (Section 6.1 of {{RFC9943}}) and an empty unprotected header map (Section 6.3 of {{RFC9943}}), other elements as submitted.
+A verifier holding a Transparent Statement recovers these bytes as that section describes.
+With the same `H` the two profiles compute the same digest for the same registered Signed Statement: for MMR_SHA256, `entry-digest` equals the CCF_LEDGER_SHA256 data-hash.
+
+Other applications of this profile define their entry as a byte string, and `entry-digest` is `H` of those bytes.
+
+## Transparency service leaf data
+
+`ts-leaf-data` lets the transparency service commit, in each leaf, values it fixes when it appends the leaf, for example a time or a sequence number it assigns.
+This profile does not define those values.
+They are committed in `x`, not carried in a header parameter of a receipt, because a receipt is signed after the leaf is appended, possibly many times, and its header parameters are asserted at that signing.
+A value in `x` is set when the leaf is appended, and the root of every tree size that includes the leaf commits to it.
+
+A transparency service that commits nothing in a leaf uses the empty byte string as its `ts-leaf-data`.
+An inclusion proof for a leaf carries its `ts-leaf-data` when it is not empty ([](#inclusion-proofs)), and a verifier hashes it without interpreting it.
+A transparency service that wants its `ts-leaf-data` to identify its own format can begin it with a type or version byte; that byte is committed with the rest of the leaf when it is appended, so it cannot disagree with the bytes it describes.
+An auditor that recomputes the leaves of the log needs the `ts-leaf-data` of every leaf, so a transparency service that expects to be audited publishes it with its entries.
+
+## leaf_value
+
+`leaf_value(i, ts_leaf_data, entry_digest)` returns the value `f` of the leaf at index `i`.
+
+Given:
+
+- `i` the zero-based index of the leaf.
+- `ts_leaf_data` the ts-leaf-data of the leaf, possibly empty.
+- `entry_digest` the entry-digest of the entry the leaf records.
+
+We define `leaf_value` as
+
+~~~~ python
+  def leaf_value(i, ts_leaf_data, entry_digest):
+
+    # H is the hash algorithm identified by the vds value,
+    # SHA-256 (MMR_SHA256) in this example
+    h = hashlib.sha256()
+
+    # A zero byte, then the big endian representation of pos
+    h.update(b"\x00")
+    h.update((i + 1).to_bytes(8, byteorder="big", signed=False))
+    h.update(hashlib.sha256(ts_leaf_data).digest())
+    h.update(entry_digest)
+    return h.digest()
+~~~~
+
+Example values for MMR_SHA256 are given in [](#leaf-value-examples).
+
 # Inclusion Proofs
 
 The CBOR representation of an inclusion proof is
@@ -163,12 +231,19 @@ inclusion-proof-content = [
   ; path proving the node's inclusion,
   ; empty when the node is a peak
   inclusion-path: [ * hash ]
+
+  ; the ts-leaf-data of the node when it
+  ; is a leaf, absent when it is empty
+  ? ts-leaf-data: bstr
 ]
 ~~~~
 
 Every element of an inclusion-path, a consistency-path or right-peaks is a node value.
 The size of a node value is fixed by the `vds` value, see [](#verifiable-data-structure-values).
 A verifier MUST reject a proof in which any such element is not of that size.
+An absent ts-leaf-data is the empty byte string.
+A transparency service MUST omit ts-leaf-data when it is empty, so that an inclusion proof has one encoding.
+Only the value of a leaf depends on ts-leaf-data, so a proof for an interior node does not carry it.
 
 Note that the inclusion path for the index leads to a single permanent node in the tree.
 This node will initially be a peak in the accumulator, as the tree grows it will eventually be "buried" by a new peak.
@@ -267,8 +342,7 @@ unprotected-header-map = {
 }
 ~~~~
 
-The payload of an inclusion proof signature is the tree peak committing to the nodes inclusion, or the node itself where the proof path is empty.
-The algorithm [included_root](#includedroot) obtains this value.
+The payload of an inclusion proof signature is the accumulator peak that commits the node, which [included_root](#includedroot) obtains.
 
 The payload MUST be detached.
 Detaching the payload forces verifiers to recompute the root from the inclusion proof,
@@ -276,10 +350,14 @@ this protects against implementation errors where the signature is verified but 
 
 ## Verifying the Receipt of inclusion
 
-A receipt of inclusion proves that a value is a node of the tree.
-When the inclusion-path is not empty, the path also binds the index because each step hashes the position of the parent; when it is empty, see [Tree size of a receipt of inclusion](#tree-size-of-a-receipt-of-inclusion).
+A receipt of inclusion proves that a value is the node of the tree at the index of the proof.
+Verification is the same for every node, leaf or interior.
+Consistency proofs rely on this: a consistency path is the inclusion path of an origin peak in the later tree, and [consistent_roots](#consistentroots) proves each origin peak by applying [included_root](#includedroot) to its node value.
 
-Whether a node is a leaf, and what its entry commits to, are properties of the leaf commitment scheme, which this profile leaves to the application; see [Leaf commitment scheme](#leaf-commitment-scheme).
+To verify that an entry, for SCITT a candidate Signed Statement, is in the tree, the verifier uses the value of its leaf: [leaf_value](#leafvalue) applied to the index, the ts-leaf-data of the proof and `entry-digest`, which the verifier computes from the bytes of the entry as [](#entries) describes.
+`entry-digest` MUST NOT be taken from the receipt.
+This defines how the inclusion proofs of this profile are consumed (Section 4.4.1 of {{-cose-receipts}}).
+The verifier does not need to check that the index is that of a leaf; see [](#leaf-value-separation).
 
 Perform the following, in order.
 Verification fails if any step fails.
@@ -290,7 +368,7 @@ Verification fails if any step fails.
 
 It is recommended that implementations return a single boolean result for Receipt verification operations, to reduce the chance of accepting a valid signature over an invalid inclusion proof.
 
-A verifier that holds a trusted tree size and accumulator can additionally check that the proven node is the accumulator peak for the index at that size, which fixes the length of the inclusion path and binds the index when the path is empty.
+A verifier that holds a trusted tree size and accumulator can additionally check that the peak the path implies is one of the peaks of that accumulator, which ties the node to that tree size.
 When it does so, the protected `vds` value MUST equal the `vds` value of the trusted accumulator.
 
 ## included_root
@@ -613,7 +691,7 @@ This process MUST proceed until there are no more completable sub trees.
 
 Given:
 
-- `f` the leaf value resulting from `H(x)` for the caller defined leaf value `x`
+- `f` the value of the leaf, from [leaf_value](#leafvalue) for the index the leaf will occupy, which is the number of nodes in `db` before the append.
 - `db` an interface supporting `append(entry) -> count` and `get(index) -> entry` methods.
   `append` stores the entry and returns the number of nodes in the store after the append, which is the index at which the next node will be stored.
 
@@ -664,13 +742,16 @@ We define `add_leaf_hash` as
 `add_leaf_hash` returns the MMR size after the append, which is a complete MMR size.
 The index of the leaf itself is one less than the value of `i` immediately after the first append.
 
+Because `f` binds the index of the leaf, it can only be computed once that index is known.
+An implementation that may retry an append, or that can race another writer for the index, MUST compute `f` again for the index at which the leaf is finally stored.
+
 ## Node values
 
 Interior nodes in the tree MUST prefix the value provided to `H(x)` with `pos`.
 
 The value `v` for any interior node MUST be `H(pos || Get(LEFT_CHILD) || Get(RIGHT_CHILD))`
 
-The algorithm for leaf addition is provided the result of `H(x)` directly.
+Leaf values are defined in [](#leaf-values); the algorithm for leaf addition is provided the leaf value directly.
 
 ### hash_pospair64
 
@@ -811,8 +892,9 @@ We define `mmr_size_for_leaf_count` as
 
 See the privacy considerations section of {{-cose-receipts}}.
 
-This profile does not define the leaf pre-image `x`.
-Confidentiality of entry contents, including resistance to guess-and-confirm of low-entropy entries, is the responsibility of the application that constructs `x` (for SCITT, see the privacy considerations of {{RFC9943}}).
+A leaf commits a digest of its entry, not the entry itself.
+Confidentiality of entry contents, including resistance to guess-and-confirm of low-entropy entries, is the responsibility of the application that defines the entry (for SCITT, see the privacy considerations of {{RFC9943}}).
+The ts-leaf-data of a leaf is carried in every receipt of inclusion for it, so a transparency service should not commit confidential values in it.
 
 # Security Considerations
 
@@ -821,15 +903,18 @@ The security considerations of {{-cose-receipts}} apply.
 ## Tree size of a receipt of inclusion
 
 A receipt of inclusion carries no tree size: it verifies in every later tree size, and alone does not tie the proven node to the history a verifier has established by receipts of consistency.
-When the inclusion path is empty the signature is over the node value alone and the index is not bound.
-An application that needs the position bound in this case can include it in the entry (see [Leaf commitment scheme](#leaf-commitment-scheme)) or check the node against a trusted accumulator for a tree size in which it is a peak.
+A verifier that needs that tie checks the peak against a trusted accumulator, as [](#verifying-the-receipt-of-inclusion) describes.
 
-## Leaf commitment scheme
+## Leaf value separation
 
-Leaf values are not domain separated from interior values as they are in {{RFC9162}}: an `x` equal to the pre-image `pos || left || right` of an interior node hashes to that node.
-With a non-empty inclusion path the position is bound and the height of the index shows whether the node is a leaf.
-With an empty path such an `x` verifies as an entry at any leaf index.
-An application should choose a form for `x` that no interior pre-image can take, for example a leading domain byte, and include the position in `x` if it needs the position bound when the path is empty.
+Leaf values are separated from interior values by the length of their pre-images, not by a prefix as in {{RFC9162}}.
+A leaf pre-image is `2N + 9` bytes and an interior pre-image is `2N + 8` bytes, so taking an interior node for a leaf, or a leaf for an interior node, requires a collision in `H`.
+Verification therefore needs no check that an index is that of a leaf: a leaf value at an interior index, or an interior node value at a leaf index, does not verify.
+A verifier that accepts `entry-digest` or a leaf value from the presenter of a receipt, instead of computing them from the entry, establishes only that some node is in the tree, not that the entry is.
+
+The transparency service chooses `ts-leaf-data`, and its meaning is the transparency service's statement.
+A different `ts-leaf-data` for a leaf gives a different tree.
+A receipt of consistency exposes that only to a verifier whose trusted tree size includes the leaf: a tree size that does not include the leaf does not commit it, so trees that differ only in later leaves are both consistent with it.
 
 ## Declared tree sizes
 
@@ -890,6 +975,43 @@ Until this label is assigned, implementations use the private use value -65933 f
 This document requests no new registries.
 
 --- back
+
+# Leaf value examples
+
+These values are for MMR_SHA256, computed with [leaf_value](#leafvalue).
+Index 0 is the first leaf and index 7 the fifth.
+
+~~~~
+entry-digest, SHA-256 of the 9 ASCII bytes "content-1":
+  1ef0ae7bbe4ce6c99ab744fe8c275821
+  78d69c660538ef6a4b201cf5a944e17a
+
+ts-leaf-data: empty
+H(ts-leaf-data):
+  e3b0c44298fc1c149afbf4c8996fb924
+  27ae41e4649b934ca495991b7852b855
+
+leaf value at i = 0:
+  60221d6ea9c3744053e7d4d82925dfef
+  8c95e2dc23b89a19000b83a020a34823
+
+leaf value at i = 7:
+  3c3d7e81366a85002245413041b304e7
+  fa4e9f4b2b1909bed538b85484848293
+
+ts-leaf-data: 010102030405060708
+H(ts-leaf-data):
+  3e445cdee8ddfdf42c12523a5b420abb
+  1d013e0706bd28656a73b037fa04ca11
+
+leaf value at i = 0:
+  a6e76b79ceb889049edbc78abd0b144c
+  9b414759e7d36a6fca6bce9a0a6d7176
+
+leaf value at i = 7:
+  ce6e7a53b94b5a566fc8c006a352b8a3
+  afa69b97d56fd25f4486bd99de18714b
+~~~~
 
 # Assumed bit primitives
 
