@@ -180,7 +180,7 @@ A value in `x` is set when the leaf is appended, and the root of every tree size
 
 A transparency service that commits nothing in a leaf uses the empty byte string as its `ts-leaf-data`.
 An inclusion proof for a leaf carries its `ts-leaf-data` ([](#inclusion-proofs)), and a verifier hashes it without interpreting it.
-The protected header parameter ts-leaf-data-type ([](#cose-receipt-of-inclusion)) can describe its format, for relying parties that interpret it.
+A transparency service that wants its `ts-leaf-data` to identify its own format can begin it with a type or version byte; that byte is committed with the rest of the leaf when it is appended, so it cannot disagree with the bytes it describes.
 An auditor that recomputes the leaves of the log needs the `ts-leaf-data` of every leaf, so a transparency service that expects to be audited publishes it with its entries.
 
 ## leaf_value
@@ -316,15 +316,12 @@ The cbor representation of an inclusion proof is:
 protected-header-map = {
   &(alg: 1) => int
   &(vds: 395) => int ; e.g. MMR_SHA256 (TBD_1)
-  ; TBD_3, private use until assigned
-  ? &(ts-leaf-data-type: -65934) => uint / tstr
   * cose-label => cose-value
 }
 ~~~~
 
 - alg (label: 1): REQUIRED. Signature algorithm identifier. Value type: int.
 - vds (label: 395): REQUIRED. verifiable data structure algorithm identifier, a value identifying the MMR defined in this document, such as MMR_SHA256, see [](#description-of-the-verifiable-data-structure). It fixes the hash algorithm `H`. Value type: int.
-- ts-leaf-data-type (label: TBD_3): OPTIONAL. The format of the ts-leaf-data of every leaf the receipt proves, see [](#transparency-service-leaf-data). The value has the syntax of the content type header parameter ({{RFC9052}}, Section 3.1): a CoAP Content-Format identifier or a media type. Verification does not use it, and it need not be listed in crit. Value type: uint or tstr.
 
 The protected header MUST meet the encoding requirements given in [COSE Receipt of Consistency](#cose-receipt-of-consistency), and a verifier MUST apply the same acceptance rules to it.
 
@@ -961,7 +958,7 @@ IANA is requested to add the following entries for MMR_SHA256 to that registry:
 
 ### COSE Header Parameters
 
-IANA is requested to add the following entries to the "COSE Header Parameters" registry established by {{-COSE}}, in the Specification Required range:
+IANA is requested to add the following entry to the "COSE Header Parameters" registry established by {{-COSE}}, in the Specification Required range:
 
 - Name: tree-size-2
 - Label: TBD_2
@@ -971,15 +968,6 @@ IANA is requested to add the following entries to the "COSE Header Parameters" r
 - Reference: RFCthis
 
 Until this label is assigned, implementations use the private use value -65933 for tree-size-2.
-
-- Name: ts-leaf-data-type
-- Label: TBD_3
-- Value Type: uint / tstr
-- Value Registry: CoAP Content-Formats, or Media Types
-- Description: The format of the ts-leaf-data of the leaves a receipt of inclusion proves
-- Reference: RFCthis
-
-Until this label is assigned, implementations use the private use value -65934 for ts-leaf-data-type.
 
 ## New Registries
 
