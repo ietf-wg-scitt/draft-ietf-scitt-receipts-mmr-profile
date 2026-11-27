@@ -946,5 +946,13 @@ For example `ones_count(b101)` is 2
 ~~~~
 
 # Acknowledgments
-
 {:numbered="false"}
+
+The authors thank the following people for their contributions.
+
+Justin Dobson asked for one concrete leaf form, and proposed a form close to the one this document defines.
+Andre Neumann, verifying a receipt from a public log, showed that the leaf rule had travelled out of band.
+Bassem [surname to confirm] analysed that gap, sketched a way to close it, and reviewed the leaf value text.
+Konrad Gruszka reviewed the leaf value design and recomputed its examples with an independent implementation.
+David Condrey contributed text to the privacy considerations, and asked for executable pseudocode with known-answer values.
+Amaury Chamayou revised the abstract and introduction, and co-authored the CCF receipts profile, with which this document aligns its statement digest.
