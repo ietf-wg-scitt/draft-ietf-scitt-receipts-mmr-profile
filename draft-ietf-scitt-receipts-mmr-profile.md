@@ -179,7 +179,7 @@ They are committed in `x`, not carried in a header parameter of a receipt, becau
 A value in `x` is set when the leaf is appended, and the root of every tree size that includes the leaf commits to it.
 
 A transparency service that commits nothing in a leaf uses the empty byte string as its `ts-leaf-data`.
-An inclusion proof for a leaf carries its `ts-leaf-data` ([](#inclusion-proofs)), and a verifier hashes it without interpreting it.
+An inclusion proof for a leaf carries its `ts-leaf-data` when it is not empty ([](#inclusion-proofs)), and a verifier hashes it without interpreting it.
 A transparency service that wants its `ts-leaf-data` to identify its own format can begin it with a type or version byte; that byte is committed with the rest of the leaf when it is appended, so it cannot disagree with the bytes it describes.
 An auditor that recomputes the leaves of the log needs the `ts-leaf-data` of every leaf, so a transparency service that expects to be audited publishes it with its entries.
 
@@ -242,6 +242,7 @@ Every element of an inclusion-path, a consistency-path or right-peaks is a node 
 The size of a node value is fixed by the `vds` value, see [](#verifiable-data-structure-values).
 A verifier MUST reject a proof in which any such element is not of that size.
 An absent ts-leaf-data is the empty byte string.
+A transparency service MUST omit ts-leaf-data when it is empty, so that an inclusion proof has one encoding.
 Only the value of a leaf depends on ts-leaf-data, so a proof for an interior node does not carry it.
 
 Note that the inclusion path for the index leads to a single permanent node in the tree.
