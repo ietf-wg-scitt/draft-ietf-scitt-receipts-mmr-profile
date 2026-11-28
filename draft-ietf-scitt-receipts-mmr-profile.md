@@ -87,7 +87,7 @@ Post-order traversal binary Merkle trees, also known as history trees, are more 
 
 # Introduction
 
-The COSE Receipts document {{-cose-receipts}} defines a common framework for defining different types of proofs, such as proof of inclusion, about verifiable data structures (VDS). For instance, inclusion proofs guarantee to a verifier that a given serializable element is recorded at a given state of the VDS, while consistency proofs are used to establish that an inclusion proof is still consistent with the new state of the VDS at a later time.
+The COSE Receipts document {{-cose-receipts}} defines a common framework for defining different types of proofs, such as proof of inclusion, about verifiable data structures (VDS). For instance, inclusion proofs guarantee to a verifier that a given serializable element is recorded in the VDS, while consistency proofs are used to establish that an inclusion proof is still consistent with the new state of the VDS at a later time.
 
 In this document, we define a new type of VDS: a post ordered binary merkle tree {{KnuthTBT}} is, logically, the unique series of perfect binary merkle trees required to commit its leaves. Such structures are also commonly known as Merkle Mountain Ranges {{PeterTodd}}.
 
@@ -343,6 +343,8 @@ unprotected-header-map = {
 ~~~~
 
 The payload of an inclusion proof signature is the accumulator peak that commits the node, which [included_root](#includedroot) obtains.
+A transparency service MUST sign a receipt of inclusion only for a peak of an accumulator it has signed in a receipt of consistency.
+It can do so by signing, with each receipt of consistency, a receipt of inclusion with an empty inclusion-path for each peak of that accumulator; replacing the inclusion proof of such a receipt gives a receipt of inclusion for any node under the peak.
 
 The payload MUST be detached.
 Detaching the payload forces verifiers to recompute the root from the inclusion proof,
@@ -351,6 +353,8 @@ this protects against implementation errors where the signature is verified but 
 ## Verifying the Receipt of inclusion
 
 A receipt of inclusion proves that a value is the node of the tree at the index of the proof.
+It commits nothing outside the subtree under the peak its path implies: neither the tree size nor the entries before that subtree.
+Receipts of consistency whose accumulators include that peak commit both.
 Verification is the same for every node, leaf or interior.
 Consistency proofs rely on this: a consistency path is the inclusion path of an origin peak in the later tree, and [consistent_roots](#consistentroots) proves each origin peak by applying [included_root](#includedroot) to its node value.
 
@@ -953,7 +957,7 @@ IANA is requested to add the following entries for MMR_SHA256 to that registry:
 
 | Verifiable Data Structure | Name | Label | CBOR Type | Description | Change Controller | Reference
 |---
-|TBD_1 | inclusion proofs | -1 | array (of bstr) | Proof of inclusion | IETF | [](#inclusion-proofs) of RFCthis
+|TBD_1 | inclusion proofs | -1 | array (of bstr) | Proof of inclusion under an accumulator peak | IETF | [](#inclusion-proofs) of RFCthis
 |TBD_1 | consistency proofs | -2 | array (of bstr) | Proof of append-only property | IETF | [](#consistency-proof) of RFCthis
 {: #iana-vds-proofs align="left" title="Additions to the COSE Verifiable Data Structure Proofs registry"}
 
